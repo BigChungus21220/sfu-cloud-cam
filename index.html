@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        .camera_image {
+            width: 20%;
+        }
+
+        .horizontal_stack {
+            float: left;
+        }
+
+        .image_container {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SFU Cloud Monitor</h1>
+    <hr/>
+    <div>
+        <div id="coverage_graph"></div>
+        <div style="padding-bottom: 30px; padding-left: 60px;">
+            <button id="decrementDate" class="horizontal_stack" type="button"><</button>
+            <input type="date" id="graphDate" class="horizontal_stack" min="2024-01-31" max="2024-01-31" value="2024-01-31""/>
+            <button id="incrementDate" class="horizontal_stack" type="button" disabled>></button>
+        </div>
+    </div>
+
+    <hr/>
+
+    <script type="module">
+        import loadGraph from "./graphManager.js"
+
+        const dt = new Date();
+        dt.setHours(dt.getHours()-8);
+        const dateString = dt.toISOString().split("T")[0];
+
+        loadGraph(dateString)
+
+        const dateSelector = document.getElementById('graphDate');
+        dateSelector.valueAsDate = dt;
+        dateSelector.max = dateString;
+
+        const dateIncrement = document.getElementById('incrementDate');
+        const dateDecrement = document.getElementById('decrementDate');
+
+        dateSelector.onchange = () => {
+            const date = dateSelector.valueAsDate;
+            loadGraph(date.toISOString().split("T")[0]);
+        };
+
+        dateIncrement.onclick = () => {
+            const date = dateSelector.valueAsDate;
+            const max = new Date(dateSelector.max);
+            if (date < max) {
+                date.setDate(date.getDate() + 1)
+                loadGraph(date.toISOString().split("T")[0]);
+                dateSelector.valueAsDate = date
+                dateDecrement.disabled = false;
+                max.setDate(max.getDate() - 1)
+                if (date > max) {
+                    dateIncrement.disabled = true;
+                }
+            }
+        };
+
+        dateDecrement.onclick = () => {
+            const date = dateSelector.valueAsDate;
+            const min = new Date(dateSelector.min);
+            if (date > min) {
+                date.setDate(date.getDate() - 1)
+                loadGraph(date.toISOString().split("T")[0]);
+                dateSelector.valueAsDate = date
+                dateIncrement.disabled = false;
+                min.setDate(min.getDate() + 1)
+                if (date < min) {
+                    dateDecrement.disabled = true;
+                }
+            }
+        };
+    </script>
+
+    <h2>Cameras</h2>
+    <div>
+        <div class="image_container">
+            <img src="./assets/libWest.png" class="camera_image horizontal_stack"></img>
+            <img src="./assets/libWest_masked.png" class="camera_image horizontal_stack"></img>
+        </div>
+        <div class="image_container">
+            <img src="./assets/towSouth.png" class="camera_image horizontal_stack"></img>
+            <img src="./assets/towSouth_masked.png" class="camera_image horizontal_stack"></img>
+        </div>
+        <div class="image_container">
+            <img src="./assets/towNorth.png" class="camera_image horizontal_stack"></img>
+            <img src="./assets/towNorth_masked.png" class="camera_image horizontal_stack"></img>
+        </div>
+        <div class="image_container">
+            <img src="./assets/aqSouthEast.png" class="camera_image horizontal_stack"></img>
+            <img src="./assets/aqSouthEast_masked.png" class="camera_image horizontal_stack"></img>
+        </div>
+    </div>
+</body>
+</html>
